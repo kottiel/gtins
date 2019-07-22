@@ -19,7 +19,7 @@ void check_gtins(FILE *fp, FILE *fpout) {
 
         if ((strcmp(gtinlabel, "GTIN") == 0) ||
             (strcmp(gtinlabel, "GS1") == 0))
-            printf("%s\n", gtinlabel);
+            printf("found %s\n", gtinlabel);
     }
 }
 
