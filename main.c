@@ -175,14 +175,12 @@ int main()
     char path[] = DIRECTORY_NAME TESTFLAG;
     char fullpath[255];
     int folderlen;
-    int files;
 
     strcpy(fullpath, path);
     strcat(fullpath, "\\");
     folderlen = strlen(fullpath);
 
     struct dirent *entry;
-    files = 0;
 
     folder = opendir(path);
     if(folder == NULL)
@@ -213,6 +211,10 @@ int main()
         else
             check_gtins(fp, folder_ar[j], fpout);
         fclose(fp);
+    }
+
+    for (int j = 0; j < filenum; j++) {
+        free(folder_ar[j]);
     }
 
     fclose(fpout);
