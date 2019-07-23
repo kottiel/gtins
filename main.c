@@ -154,7 +154,7 @@ void check_gtins(FILE *fp, char *filename, FILE *fpout) {
                 long long gtin_dec = strtoll(gtin, &endptr, 10);
 
                 //if ((gtin_length != GTIN_14) && (gtin_length != GTIN_13))
-                    //fprintf(fpout, "Invalid GTIN length \"%-20s\" in record %4d of file %-28s (label %s).\n", gtin, line_num, filename, label);
+                //fprintf(fpout, "Invalid GTIN length \"%-20s\" in record %4d of file %-28s (label %s).\n", gtin, line_num, filename, label);
                 if (isNumeric(gtin) == 0)
                     fprintf(fpout, "Nonnmrc GTIN value  \"%-20s\" in record %4d of file %-28s (label %s).\n", gtin, line_num, filename, label);
                 else if ((gtin_length == GTIN_14) && (gtin_dec % 10 != checkDigit(&gtin_dec)))
@@ -169,6 +169,9 @@ int main()
 {
     DIR *folder;
     FILE *fp, *fpout;
+
+    char *folder_ar[2000];
+
     char path[] = DIRECTORY_NAME TESTFLAG;
     char fullpath[255];
     int folderlen;
@@ -194,21 +197,22 @@ int main()
         fprintf(stderr, "Error : Failed to open output_file\n");
         return 1;
     }
+    int filenum = 0;
+    while  ((entry = readdir(folder))) {
+        folder_ar[filenum] = (char *)malloc(60);
+        strcpy(folder_ar[filenum++], entry->d_name);
+    }
 
-    while((entry = readdir(folder))) {
-        if ((strcmp(entry->d_name, ".") != 0) && (strcmp(entry->d_name, "..") != 0)) {
-            files++;
-            printf("Checking %3d: %s\n", files, entry->d_name);
-            fullpath[folderlen] = '\0';
-            strcat(fullpath, entry->d_name);
-            fp = fopen(fullpath, "r");
-            if (fp == NULL)
-                printf("Could not open file %s\n", fullpath);
-            else
-                check_gtins(fp, entry->d_name, fpout);
-            fclose(fp);
-        }
-
+    for (int j = 2; j < filenum; j++) {
+        printf("Checking %3d: %s\n", j, folder_ar[j]);
+        fullpath[folderlen] = '\0';
+        strcat(fullpath, folder_ar[j]);
+        fp = fopen(fullpath, "r");
+        if (fp == NULL)
+            printf("Could not open file %s\n", fullpath);
+        else
+            check_gtins(fp, folder_ar[j], fpout);
+        fclose(fp);
     }
 
     fclose(fpout);
